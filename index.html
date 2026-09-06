@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>MJ 节奏挑战</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="bg-image-layer" aria-hidden="true"></div>
+    <div class="particles" id="particles"></div>
+
+    <!-- 启动画面 -->
+    <div class="splash-screen" id="splashScreen">
+        <div class="splash-logo">MJ</div>
+        <div class="splash-subtitle">节奏挑战</div>
+        <div class="splash-hint">60秒输入挑战</div>
+        <button class="splash-btn" id="splashBtn">开始游戏</button>
+    </div>
+
+    <!-- 游戏主容器 -->
+    <div class="game-container" id="gameContainer">
+        <div class="top-bar">
+            <div class="game-title">MJ 节奏</div>
+            <button class="theme-btn" id="themeBtn" aria-label="切换主题">暗</button>
+        </div>
+
+        <div class="card" id="card">
+            <div class="timer-section">
+                <div class="timer-display" id="timerDisplay">60</div>
+                <div class="timer-bar">
+                    <div class="timer-bar-fill" id="timerBarFill"></div>
+                </div>
+            </div>
+
+            <div class="score-section">
+                <div class="score-display" id="scoreDisplay">0</div>
+            </div>
+
+            <div class="combo-wrap" id="comboWrap">
+                连击 <span class="combo-num" id="comboNum">0</span>
+            </div>
+
+            <div class="feedback" id="feedback">输入 "MJ" 开始得分</div>
+
+            <div class="input-area">
+                <input type="text" class="input-field" id="inputField" placeholder="输入 MJ..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" maxlength="10" disabled>
+                <div class="input-hint">正确 +1 分 | 错误 -2 分 | 不区分大小写</div>
+            </div>
+
+            <button class="btn btn-secondary" id="restartBtn" style="display:none;">重新开始</button>
+
+            <div class="overlay" id="endOverlay">
+                <div class="overlay-title">时间到</div>
+                <div class="overlay-score" id="finalScore">0</div>
+                <div class="overlay-subtitle" id="finalMessage">干得漂亮！</div>
+                <div class="overlay-stats">
+                    <span>正确 <strong id="finalCorrect">0</strong></span>
+                    <span>错误 <strong id="finalError">0</strong></span>
+                    <span>最高连击 <strong id="finalMaxCombo">0</strong></span>
+                </div>
+                <button class="btn btn-primary" id="playAgainBtn">再来一局</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
