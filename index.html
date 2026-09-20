@@ -60,11 +60,26 @@
                     <span>错误 <strong id="finalError">0</strong></span>
                     <span>最高连击 <strong id="finalMaxCombo">0</strong></span>
                 </div>
+
+                <!-- 名字输入 -->
+                <input type="text" id="playerName" class="name-input"
+                       placeholder="输入你的名字" maxlength="12" autocomplete="off">
+
+                <!-- 在线排行榜 -->
+                <div class="leaderboard" id="leaderboard">
+                    <div class="leaderboard-title">🏆 在线排行榜</div>
+                    <div class="leaderboard-list" id="leaderboardList">
+                        <div class="leaderboard-empty">加载中...</div>
+                    </div>
+                </div>
+
                 <button class="btn btn-primary" id="playAgainBtn">再来一局</button>
             </div>
         </div>
     </div>
 
+    <!-- Supabase SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="script.js"></script>
 </body>
 </html>

@@ -1,4 +1,9 @@
 (function() {
+    // ========== Supabase 配置（改成你自己的） ==========
+    const SUPABASE_URL = 'https://bignhwmpjnplzksokzif.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpZ25od21wam5wbHprc29remlmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk4MTI1NTAsImV4cCI6MjEwNTM4ODU1MH0.FlZRCL5FlT3X1AVIKt02CLoK8CqF8Lja8YAk1f2reL4';
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
     // ========== DOM 元素 ==========
     const splashScreen = document.getElementById('splashScreen');
     const splashBtn = document.getElementById('splashBtn');
@@ -20,6 +25,8 @@
     const finalError = document.getElementById('finalError');
     const finalMaxCombo = document.getElementById('finalMaxCombo');
     const particlesContainer = document.getElementById('particles');
+    const playerName = document.getElementById('playerName');
+    const leaderboardList = document.getElementById('leaderboardList');
 
     // ========== 游戏常量与状态 ==========
     const GAME_DURATION = 60;
@@ -34,6 +41,7 @@
     let lastTimestamp = null;
     let feedbackTimeout = null;
     let lastTickSecond = GAME_DURATION;
+    let currentRecordId = null;
 
     // ========== 音频系统 ==========
     let audioCtx = null;
@@ -108,7 +116,6 @@
         setTheme(getTheme() === 'dark' ? 'light' : 'dark');
     }
 
-    // 初始化主题
     try {
         const saved = localStorage.getItem('mj-theme');
         if (saved === 'light' || saved === 'dark') setTheme(saved);
@@ -170,6 +177,88 @@
             feedback.className = 'feedback';
             feedback.textContent = '输入 "MJ" 开始得分';
         }, 1000);
+    }
+
+    // ========== 在线排行榜 ==========
+    async function submitScore(entry) {
+        try {
+            const { data, error } = await supabase
+                .from('scores')
+                .insert([entry])
+                .select()
+                .single();
+            if (error) {
+                console.warn('提交失败', error);
+                return null;
+            }
+            return data;
+        } catch (e) {
+            console.warn('提交异常', e);
+            return null;
+        }
+    }
+
+    async function updateScoreName(id, name) {
+        if (!id) return;
+        try {
+            const { error } = await supabase
+                .from('scores')
+                .update({ name: name })
+                .eq('id', id);
+            if (error) console.warn('更新名字失败', error);
+        } catch (e) {
+            console.warn('更新异常', e);
+        }
+    }
+
+    async function fetchTopScores(limit = 10) {
+        try {
+            const { data, error } = await supabase
+                .from('scores')
+                .select('*')
+                .order('score', { ascending: false })
+                .order('max_combo', { ascending: false })
+                .limit(limit);
+            if (error) {
+                console.warn('读取排行榜失败', error);
+                return [];
+            }
+            return data || [];
+        } catch (e) {
+            console.warn('读取异常', e);
+            return [];
+        }
+    }
+
+    async function renderOnlineLeaderboard() {
+        if (!leaderboardList) return;
+        leaderboardList.innerHTML = '<div class="leaderboard-empty">加载中...</div>';
+        const list = await fetchTopScores(10);
+        if (!list || list.length === 0) {
+            leaderboardList.innerHTML = '<div class="leaderboard-empty">暂无记录，快来抢第一！</div>';
+            return;
+        }
+        const medals = ['🥇', '🥈', '🥉'];
+        leaderboardList.innerHTML = list.map((item, i) => {
+            const rankClass = i < 3 ? ` top-${i + 1}` : '';
+            const rankText = i < 3 ? medals[i] : (i + 1);
+            const name = escapeHtml(item.name || '匿名玩家');
+            return `<div class="leaderboard-item${rankClass}">
+                <span class="rank">${rankText}</span>
+                <span class="lb-name">${name}</span>
+                <span class="lb-detail">连击${item.max_combo}</span>
+                <span class="lb-score">${item.score}</span>
+            </div>`;
+        }).join('');
+    }
+
+    function escapeHtml(str) {
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
     }
 
     // ========== 游戏逻辑 ==========
@@ -259,7 +348,6 @@
         timerDisplay.classList.toggle('urgent', urgent);
         timerBarFill.classList.toggle('urgent', urgent);
 
-        // 最后5秒滴答声
         if (isPlaying && sec <= 5 && sec !== lastTickSecond && sec > 0) {
             playTickSound();
             lastTickSecond = sec;
@@ -277,6 +365,7 @@
         errorCount = 0;
         timeRemaining = GAME_DURATION;
         lastTickSecond = GAME_DURATION;
+        currentRecordId = null;
         isPlaying = true;
         updateUI();
         updateTimerDisplay();
@@ -296,6 +385,7 @@
         playGameOverSound();
         inputField.disabled = true;
         inputField.value = '';
+
         finalScore.textContent = score;
         finalCorrect.textContent = correctCount;
         finalError.textContent = errorCount;
@@ -308,8 +398,29 @@
         else if (score >= 0) finalMessage.textContent = '刚刚起步！';
         else finalMessage.textContent = '再试一次吧！';
 
+        // 恢复上次用的名字
+        try {
+            const savedName = localStorage.getItem('mj-player-name');
+            if (savedName) playerName.value = savedName;
+        } catch (e) {}
+
         endOverlay.classList.add('active');
         restartBtn.style.display = 'none';
+
+        // 提交成绩
+        const name = (playerName.value || '').trim() || '匿名玩家';
+        try { localStorage.setItem('mj-player-name', name); } catch (e) {}
+
+        submitScore({
+            name: name,
+            score: score,
+            correct: correctCount,
+            error: errorCount,
+            max_combo: maxCombo
+        }).then((record) => {
+            if (record && record.id) currentRecordId = record.id;
+            renderOnlineLeaderboard();
+        });
     }
 
     function resetAndStart() {
@@ -321,6 +432,7 @@
         correctCount = 0;
         errorCount = 0;
         timeRemaining = GAME_DURATION;
+        currentRecordId = null;
         updateUI();
         updateTimerDisplay();
         feedback.className = 'feedback';
@@ -369,7 +481,7 @@
     });
 
     document.getElementById('card').addEventListener('click', function(e) {
-        if (isPlaying && !e.target.closest('.input-field') && !e.target.closest('.btn') && !e.target.closest('.theme-btn')) {
+        if (isPlaying && !e.target.closest('.input-field') && !e.target.closest('.btn') && !e.target.closest('.theme-btn') && !e.target.closest('.name-input') && !e.target.closest('.leaderboard')) {
             inputField.focus();
         }
     });
@@ -377,7 +489,23 @@
     playAgainBtn.addEventListener('click', startGame);
     restartBtn.addEventListener('click', resetAndStart);
 
+    // 名字改变时更新刚才提交的那条记录
+    let nameUpdateTimeout = null;
+    playerName.addEventListener('input', function() {
+        const name = (playerName.value || '').trim() || '匿名玩家';
+        try { localStorage.setItem('mj-player-name', name); } catch (e) {}
+
+        if (nameUpdateTimeout) clearTimeout(nameUpdateTimeout);
+        nameUpdateTimeout = setTimeout(async () => {
+            if (currentRecordId) {
+                await updateScoreName(currentRecordId, name);
+                renderOnlineLeaderboard();
+            }
+        }, 700);
+    });
+
     document.addEventListener('keydown', function(e) {
+        if (e.target === playerName || e.target === inputField) return;
         if (e.key === ' ' && !isPlaying && gameContainer.classList.contains('visible')) {
             e.preventDefault();
             if (endOverlay.classList.contains('active')) {
@@ -392,4 +520,11 @@
     inputField.disabled = true;
     restartBtn.style.display = 'none';
     gameContainer.classList.remove('visible');
+
+    // 预加载排行榜（可选）
+    fetchTopScores(10).then(list => {
+        if (list && list.length > 0) {
+            // 静默缓存，等结束界面再渲染
+        }
+    });
 })();
