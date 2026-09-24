@@ -26,7 +26,8 @@
     const finalMaxCombo = document.getElementById('finalMaxCombo');
     const particlesContainer = document.getElementById('particles');
     const playerName = document.getElementById('playerName');
-
+    const uploadBtn = document.getElementById('uploadBtn');
+    
     // 灵动岛元素
     const dynamicIsland = document.getElementById('dynamicIsland');
     const playPauseBtn = document.getElementById('playPauseBtn');
@@ -47,19 +48,16 @@
     let lastTimestamp = null;
     let feedbackTimeout = null;
     let lastTickSecond = GAME_DURATION;
+    let currentGameData = null;
 
     // ========== 音频系统 ==========
     let audioCtx = null;
-
     function initAudio() {
         try {
-            if (!audioCtx) {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            }
+            if (!audioCtx) { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
             if (audioCtx.state === 'suspended') audioCtx.resume();
         } catch (e) { console.warn('无法初始化音频上下文', e); }
     }
-
     function playTone(freq, duration, type = 'sine', volume = 0.3, delay = 0) {
         if (!audioCtx) return;
         try {
@@ -70,13 +68,11 @@
             gain.gain.setValueAtTime(0.0001, audioCtx.currentTime + delay);
             gain.gain.exponentialRampToValueAtTime(volume, audioCtx.currentTime + delay + 0.01);
             gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + delay + duration);
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
+            osc.connect(gain); gain.connect(audioCtx.destination);
             osc.start(audioCtx.currentTime + delay);
             osc.stop(audioCtx.currentTime + delay + duration + 0.05);
         } catch (e) { console.warn('播放音效失败', e); }
     }
-
     function playCorrectSound() { playTone(880, 0.08, 'triangle', 0.3); setTimeout(() => playTone(1174.66, 0.06, 'triangle', 0.2, 0.05), 50); }
     function playErrorSound() { playTone(220, 0.2, 'sawtooth', 0.15); }
     function playStartSound() { playTone(500, 0.1, 'sine', 0.2); setTimeout(() => playTone(700, 0.1, 'sine', 0.2, 0.1), 100); }
@@ -105,8 +101,7 @@
             const p = document.createElement('div');
             p.className = 'particle';
             const size = 30 + Math.random() * 60;
-            p.style.width = size + 'px';
-            p.style.height = size + 'px';
+            p.style.width = size + 'px'; p.style.height = size + 'px';
             p.style.left = Math.random() * 100 + '%';
             p.style.background = `radial-gradient(circle, ${colors[i % colors.length]} 0%, transparent 70%)`;
             p.style.animationDuration = (15 + Math.random() * 20) + 's';
@@ -137,7 +132,6 @@
         comboNum.textContent = combo;
         comboWrap.classList.toggle('high', combo >= 5);
     }
-
     function showFeedback(text, type) {
         feedback.textContent = text;
         feedback.className = 'feedback';
@@ -154,42 +148,31 @@
     async function submitScore(entry) {
         try {
             const { data, error } = await supabase.from('scores').insert([entry]).select();
-            if (error) console.warn('提交失败', error);
-            return data;
-        } catch (e) { console.warn('提交异常', e); return null; }
+            if (error) { console.warn('提交失败', error); return false; }
+            return true;
+        } catch (e) { console.warn('提交异常', e); return false; }
     }
 
     // ========== 游戏逻辑 ==========
     function handleCorrect() {
         score += 1; correctCount++; combo++;
         if (combo > maxCombo) maxCombo = combo;
-        updateUI();
-        playCorrectSound();
-        scoreDisplay.classList.remove('fly-pop', 'fly-shake');
-        void scoreDisplay.offsetWidth;
+        updateUI(); playCorrectSound();
+        scoreDisplay.classList.remove('fly-pop', 'fly-shake'); void scoreDisplay.offsetWidth;
         scoreDisplay.classList.add('fly-pop');
-        comboNum.classList.remove('fly');
-        void comboNum.offsetWidth;
-        comboNum.classList.add('fly');
-        inputField.classList.remove('fly-correct', 'fly-error');
-        void inputField.offsetWidth;
+        comboNum.classList.remove('fly'); void comboNum.offsetWidth; comboNum.classList.add('fly');
+        inputField.classList.remove('fly-correct', 'fly-error'); void inputField.offsetWidth;
         inputField.classList.add('fly-correct');
         showFeedback('正确！+1', 'correct');
         showFloatText('+1', 'positive');
     }
-
     function handleError() {
         score -= 2; errorCount++; combo = 0;
-        updateUI();
-        playErrorSound();
-        scoreDisplay.classList.remove('fly-pop', 'fly-shake');
-        void scoreDisplay.offsetWidth;
+        updateUI(); playErrorSound();
+        scoreDisplay.classList.remove('fly-pop', 'fly-shake'); void scoreDisplay.offsetWidth;
         scoreDisplay.classList.add('fly-shake');
-        comboNum.classList.remove('fly');
-        void comboNum.offsetWidth;
-        comboNum.classList.add('fly');
-        inputField.classList.remove('fly-correct', 'fly-error');
-        void inputField.offsetWidth;
+        comboNum.classList.remove('fly'); void comboNum.offsetWidth; comboNum.classList.add('fly');
+        inputField.classList.remove('fly-correct', 'fly-error'); void inputField.offsetWidth;
         inputField.classList.add('fly-error');
         showFeedback('错误！-2', 'error');
         showFloatText('-2', 'negative');
@@ -197,14 +180,12 @@
 
     // ========== 计时器 ==========
     function startTimer() {
-        timeRemaining = GAME_DURATION;
-        lastTickSecond = GAME_DURATION;
+        timeRemaining = GAME_DURATION; lastTickSecond = GAME_DURATION;
         updateTimerDisplay();
         if (animationId) cancelAnimationFrame(animationId);
         lastTimestamp = null;
         animationId = requestAnimationFrame(tickTimer);
     }
-
     function tickTimer(timestamp) {
         if (!isPlaying) return;
         if (lastTimestamp === null) { lastTimestamp = timestamp; animationId = requestAnimationFrame(tickTimer); return; }
@@ -215,12 +196,10 @@
         updateTimerDisplay();
         animationId = requestAnimationFrame(tickTimer);
     }
-
     function stopTimer() {
         if (animationId) { cancelAnimationFrame(animationId); animationId = null; }
         lastTimestamp = null;
     }
-
     function updateTimerDisplay() {
         const sec = Math.ceil(timeRemaining);
         timerDisplay.textContent = sec;
@@ -236,13 +215,17 @@
         initAudio(); playStartSound();
         score = 0; combo = 0; maxCombo = 0; correctCount = 0; errorCount = 0;
         timeRemaining = GAME_DURATION; lastTickSecond = GAME_DURATION;
+        currentGameData = null;
         isPlaying = true;
         updateUI(); updateTimerDisplay();
-        feedback.className = 'feedback';
-        feedback.textContent = '输入 "MJ" 开始得分';
+        feedback.className = 'feedback'; feedback.textContent = '输入 "MJ" 开始得分';
         inputField.disabled = false; inputField.value = ''; inputField.focus();
         endOverlay.classList.remove('active');
         restartBtn.style.display = 'block';
+        // 重置上传按钮状态
+        uploadBtn.disabled = false;
+        uploadBtn.className = 'btn btn-secondary';
+        uploadBtn.textContent = '📤 上传成绩到排行榜';
         startTimer();
     }
 
@@ -271,16 +254,23 @@
 
         const name = (playerName.value || '').trim() || '匿名玩家';
         try { localStorage.setItem('mj-player-name', name); } catch (e) {}
-        submitScore({ name: name, score: score, correct: correctCount, error: errorCount, max_combo: maxCombo });
+        
+        // 暂存本局数据，等待玩家点击上传
+        currentGameData = {
+            name: name, score: score, correct: correctCount, error: errorCount, max_combo: maxCombo
+        };
+        // 重置上传按钮
+        uploadBtn.disabled = false;
+        uploadBtn.className = 'btn btn-secondary';
+        uploadBtn.textContent = '📤 上传成绩到排行榜';
     }
 
     function resetAndStart() {
         stopTimer(); isPlaying = false;
-        score = 0; combo = 0; maxCombo = 0; correctCount = 0; errorCount = 0;
-        timeRemaining = GAME_DURATION;
+        score = 0; combo = 0; maxCombo = 0; correctCount = 0; errorCount = 0; timeRemaining = GAME_DURATION;
+        currentGameData = null;
         updateUI(); updateTimerDisplay();
-        feedback.className = 'feedback';
-        feedback.textContent = '输入 "MJ" 开始得分';
+        feedback.className = 'feedback'; feedback.textContent = '输入 "MJ" 开始得分';
         inputField.disabled = true; inputField.value = '';
         endOverlay.classList.remove('active');
         restartBtn.style.display = 'none';
@@ -322,12 +312,13 @@
     playAgainBtn.addEventListener('click', startGame);
     restartBtn.addEventListener('click', resetAndStart);
 
+    // 名字改变时保存到本地
     let nameUpdateTimeout = null;
     playerName.addEventListener('input', function() {
         const name = (playerName.value || '').trim() || '匿名玩家';
         try { localStorage.setItem('mj-player-name', name); } catch (e) {}
         if (nameUpdateTimeout) clearTimeout(nameUpdateTimeout);
-        nameUpdateTimeout = setTimeout(() => {}, 700); // 留空，防止重复提交
+        nameUpdateTimeout = setTimeout(() => {}, 700);
     });
 
     document.addEventListener('keydown', function(e) {
@@ -338,11 +329,38 @@
         }
     });
 
+    // ========== 上传按钮逻辑 ==========
+    uploadBtn.addEventListener('click', async function() {
+        if (this.disabled) return;
+        if (!currentGameData) return;
+
+        // 同步最新的名字（防止玩家在点击前修改名字）
+        currentGameData.name = (playerName.value || '').trim() || '匿名玩家';
+        try { localStorage.setItem('mj-player-name', currentGameData.name); } catch (e) {}
+
+        this.disabled = true;
+        this.className = 'btn btn-secondary';
+        this.textContent = '⏳ 上传中...';
+
+        try {
+            const ok = await submitScore(currentGameData);
+            if (ok) {
+                this.className = 'btn btn-secondary success';
+                this.textContent = '✅ 已上传到排行榜';
+            } else {
+                throw new Error('上传失败');
+            }
+        } catch (e) {
+            this.disabled = false;
+            this.className = 'btn btn-secondary error';
+            this.textContent = '❌ 上传失败，点击重试';
+        }
+    });
+
     // ========== 灵动岛逻辑 ==========
     let isIslandExpanded = false;
-
     dynamicIsland.addEventListener('click', function(e) {
-        if (e.target.closest('.island-btn')) return; // 点按钮不折叠
+        if (e.target.closest('.island-btn')) return;
         isIslandExpanded = !isIslandExpanded;
         dynamicIsland.classList.toggle('expanded', isIslandExpanded);
     });
@@ -369,8 +387,7 @@
     });
 
     // ========== 初始化 ==========
-    updateUI();
-    updateTimerDisplay();
+    updateUI(); updateTimerDisplay();
     inputField.disabled = true;
     restartBtn.style.display = 'none';
     gameContainer.classList.remove('visible');

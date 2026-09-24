@@ -50,11 +50,7 @@
     --glass-brightness: 1.02;
 }
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
     font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
@@ -73,7 +69,7 @@ body {
     will-change: background;
 }
 
-/* ===== 背景图片层 ===== */
+/* 背景图片层 */
 .bg-image-layer {
     position: fixed;
     inset: -20px;
@@ -100,7 +96,7 @@ body {
     filter: saturate(1.15) contrast(0.98) brightness(1.05);
 }
 
-/* ===== 粒子层 ===== */
+/* 粒子层 */
 .particles {
     position: fixed;
     inset: 0;
@@ -111,10 +107,7 @@ body {
     transform: translateZ(0);
     mix-blend-mode: screen;
 }
-[data-theme="light"] .particles {
-    opacity: 0.2;
-    mix-blend-mode: multiply;
-}
+[data-theme="light"] .particles { opacity: 0.2; mix-blend-mode: multiply; }
 .particle {
     position: absolute;
     border-radius: 50%;
@@ -126,866 +119,18 @@ body {
     will-change: transform, opacity;
     backface-visibility: hidden;
 }
-.particle:nth-child(odd) {
-    background: radial-gradient(circle, var(--accent2) 0%, transparent 70%);
-}
-.particle:nth-child(3n) {
-    background: radial-gradient(circle, var(--accent3) 0%, transparent 70%);
-}
+.particle:nth-child(odd) { background: radial-gradient(circle, var(--accent2) 0%, transparent 70%); }
+.particle:nth-child(3n) { background: radial-gradient(circle, var(--accent3) 0%, transparent 70%); }
 
 @keyframes floatGlow {
-    0% {
-        transform: translate3d(0, 100vh, 0) scale(0.8);
-        opacity: 0;
-    }
-    15% {
-        opacity: 0.5;
-    }
-    50% {
-        transform: translate3d(30px, 50vh, 0) scale(1.3);
-        opacity: 0.7;
-    }
-    85% {
-        opacity: 0.4;
-    }
-    100% {
-        transform: translate3d(-20px, -10vh, 0) scale(0.6);
-        opacity: 0;
-    }
+    0% { transform: translate3d(0, 100vh, 0) scale(0.8); opacity: 0; }
+    15% { opacity: 0.5; }
+    50% { transform: translate3d(30px, 50vh, 0) scale(1.3); opacity: 0.7; }
+    85% { opacity: 0.4; }
+    100% { transform: translate3d(-20px, -10vh, 0) scale(0.6); opacity: 0; }
 }
 
-/* ========== 启动画面 ========== */
-.splash-screen {
-    position: fixed;
-    inset: 0;
-    z-index: 100;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 24px;
-    background: rgba(10, 10, 25, 0.55);
-    backdrop-filter: blur(30px) saturate(1.5) brightness(1.05);
-    -webkit-backdrop-filter: blur(30px) saturate(1.5) brightness(1.05);
-    transition: all 0.5s var(--fly-ease);
-    will-change: opacity, transform, backdrop-filter;
-    padding: 20px;
-}
-[data-theme="light"] .splash-screen {
-    background: rgba(255, 255, 255, 0.45);
-    backdrop-filter: blur(35px) saturate(1.7) brightness(1.02);
-    -webkit-backdrop-filter: blur(35px) saturate(1.7) brightness(1.02);
-}
-.splash-screen.hidden {
-    opacity: 0;
-    pointer-events: none;
-    transform: translateY(-30px);
-}
-.splash-logo {
-    font-size: 4rem;
-    font-weight: 900;
-    background: linear-gradient(135deg, var(--accent), var(--accent2), var(--accent3));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    letter-spacing: -3px;
-    animation: logoFloat 2.5s ease-in-out infinite, logoFlyIn 1s var(--fly-ease) 0.2s both;
-    will-change: transform;
-}
-.splash-subtitle {
-    font-size: 1.1rem;
-    color: var(--text-secondary);
-    letter-spacing: 2px;
-    font-weight: 600;
-    animation: subtitleFlyIn 0.8s var(--fly-ease) 0.5s both;
-    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.2);
-}
-.splash-hint {
-    font-size: 0.85rem;
-    color: var(--text-secondary);
-    opacity: 0.75;
-    animation: subtitleFlyIn 0.8s var(--fly-ease) 0.7s both;
-    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.15);
-}
-.splash-btn {
-    padding: 18px 48px;
-    font-size: 1.15rem;
-    font-weight: 800;
-    border: none;
-    border-radius: 16px;
-    cursor: pointer;
-    letter-spacing: 2px;
-    font-family: inherit;
-    background: linear-gradient(135deg, var(--accent), var(--accent2));
-    color: #fff;
-    box-shadow: 0 8px 30px rgba(124, 58, 237, 0.5), 0 0 30px rgba(124, 58, 237, 0.3) inset;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    transition: all 0.3s var(--spring-ease);
-    animation: splashBtnFlyIn 0.9s var(--fly-ease) 0.9s both;
-    will-change: transform;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-}
-.splash-btn:hover {
-    transform: translateY(-4px) scale(1.04);
-    box-shadow: 0 14px 40px rgba(124, 58, 237, 0.6), 0 0 40px rgba(124, 58, 237, 0.4) inset;
-}
-.splash-btn:active {
-    transform: translateY(0) scale(0.95);
-    transition-duration: 0.06s;
-}
-
-@keyframes logoFloat {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-12px); }
-}
-@keyframes logoFlyIn {
-    0% { transform: translateY(60px) scale(0.7); opacity: 0; }
-    100% { transform: translateY(0) scale(1); opacity: 1; }
-}
-@keyframes subtitleFlyIn {
-    0% { transform: translateY(30px); opacity: 0; }
-    100% { transform: translateY(0); opacity: 1; }
-}
-@keyframes splashBtnFlyIn {
-    0% { transform: translateY(50px) scale(0.7); opacity: 0; }
-    100% { transform: translateY(0) scale(1); opacity: 1; }
-}
-
-/* ========== 游戏主容器 ========== */
-.game-container {
-    position: relative;
-    z-index: 1;
-    width: 100%;
-    max-width: 480px;
-    padding: 24px 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 14px;
-    transform: translateZ(0);
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.4s ease;
-}
-.game-container.visible {
-    opacity: 1;
-    pointer-events: all;
-}
-
-/* 顶栏 */
-.top-bar {
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 4px;
-    opacity: 0;
-}
-.game-container.visible .top-bar {
-    animation: flyInDown 0.6s var(--fly-ease) 0.1s both;
-}
-.game-title {
-    font-size: 1.6rem;
-    font-weight: 800;
-    background: linear-gradient(135deg, var(--accent), var(--accent2));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    letter-spacing: -0.5px;
-    filter: drop-shadow(0 2px 8px rgba(124, 58, 237, 0.35));
-}
-.theme-btn {
-    width: 42px;
-    height: 42px;
-    border-radius: 50%;
-    border: 1px solid var(--card-border);
-    background: var(--card-bg);
-    backdrop-filter: blur(28px) saturate(1.5) brightness(1.08);
-    -webkit-backdrop-filter: blur(28px) saturate(1.5) brightness(1.08);
-    cursor: pointer;
-    font-size: 0.85rem;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.3s var(--spring-ease);
-    color: var(--text);
-    letter-spacing: 0.5px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(255, 255, 255, 0.06) inset;
-    will-change: transform;
-}
-.theme-btn:hover {
-    transform: scale(1.08);
-    box-shadow: 0 6px 22px rgba(0, 0, 0, 0.28), 0 0 0 1px rgba(255, 255, 255, 0.1) inset;
-}
-.theme-btn:active {
-    transform: scale(0.92);
-    transition-duration: 0.06s;
-}
-
-/* 主卡片 */
-.card {
-    width: 100%;
-    background: var(--card-bg);
-    border: 1px solid var(--card-border);
-    border-radius: 24px;
-    padding: 24px 20px;
-    backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
-    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
-    box-shadow: var(--shadow);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 18px;
-    position: relative;
-    overflow: hidden;
-    transform: translateZ(0);
-    backface-visibility: hidden;
-    opacity: 0;
-    will-change: backdrop-filter, transform;
-    transition: background 0.4s ease, border-color 0.4s ease, backdrop-filter 0.4s ease;
-}
-.game-container.visible .card {
-    animation: flyInUp 0.9s var(--fly-ease) 0.3s both;
-}
-.card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 50%;
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0) 100%);
-    pointer-events: none;
-    border-radius: 24px 24px 50% 50% / 24px 24px 30% 30%;
-    opacity: 0.35;
-    mix-blend-mode: overlay;
-    z-index: 0;
-}
-.card::after {
-    content: '';
-    position: absolute;
-    inset: -1px;
-    border-radius: 24px;
-    padding: 1px;
-    background: linear-gradient(135deg, var(--card-border-highlight), transparent 40%, transparent 60%, var(--card-border-highlight));
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-    pointer-events: none;
-    opacity: 0.5;
-    z-index: 0;
-}
-.card > * {
-    position: relative;
-    z-index: 1;
-}
-
-/* 计时器 */
-.timer-section {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
-    opacity: 0;
-}
-.game-container.visible .timer-section {
-    animation: flyInUp 0.6s var(--fly-ease) 0.55s both;
-}
-.timer-display {
-    font-size: 3.2rem;
-    font-weight: 900;
-    line-height: 1;
-    letter-spacing: -1px;
-    font-variant-numeric: tabular-nums;
-    transition: color 0.2s var(--smooth-ease);
-    display: inline-block;
-    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
-}
-[data-theme="light"] .timer-display {
-    text-shadow: 0 2px 10px rgba(255, 255, 255, 0.5);
-}
-.timer-display.urgent {
-    color: var(--timer-urgent);
-    animation: pulseSmooth 0.5s var(--smooth-ease) infinite;
-}
-.timer-bar {
-    width: 100%;
-    height: 5px;
-    background: rgba(255, 255, 255, 0.12);
-    border-radius: 3px;
-    overflow: hidden;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15) inset;
-}
-.timer-bar-fill {
-    height: 100%;
-    background: linear-gradient(90deg, var(--accent), var(--accent2), var(--accent3));
-    border-radius: 3px;
-    transition: width 0.05s linear;
-    will-change: width;
-}
-.timer-bar-fill.urgent {
-    background: var(--timer-urgent);
-    box-shadow: 0 0 10px var(--timer-urgent);
-}
-
-@keyframes pulseSmooth {
-    0%, 100% { transform: scale(1); opacity: 1; }
-    50% { transform: scale(1.05); opacity: 0.7; }
-}
-
-/* 分数 */
-.score-section {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    opacity: 0;
-}
-.game-container.visible .score-section {
-    animation: flyInUp 0.6s var(--fly-ease) 0.65s both;
-}
-.score-display {
-    font-size: 4.5rem;
-    font-weight: 900;
-    line-height: 1;
-    letter-spacing: -2px;
-    text-shadow: 0 0 35px rgba(124, 58, 237, 0.55), 0 2px 12px rgba(0, 0, 0, 0.18);
-    display: inline-block;
-}
-[data-theme="light"] .score-display {
-    text-shadow: 0 0 35px rgba(124, 58, 237, 0.35), 0 2px 10px rgba(255, 255, 255, 0.4);
-}
-.score-display.fly-pop {
-    animation: flyPopIn 0.5s var(--spring-ease);
-}
-.score-display.fly-shake {
-    animation: flyShakeIn 0.45s var(--smooth-ease);
-}
-
-@keyframes flyPopIn {
-    0% { transform: translateY(40px) scale(0.6); opacity: 0; }
-    60% { transform: translateY(-5px) scale(1.1); opacity: 1; }
-    100% { transform: translateY(0) scale(1); opacity: 1; }
-}
-@keyframes flyShakeIn {
-    0% { transform: translateY(30px) translateX(0); opacity: 0; }
-    20% { transform: translateY(0) translateX(-12px); opacity: 1; }
-    40% { transform: translateX(10px); }
-    60% { transform: translateX(-6px); }
-    80% { transform: translateX(3px); }
-    100% { transform: translateX(0); }
-}
-
-/* 连击 */
-.combo-wrap {
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: var(--text-secondary);
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    min-height: 28px;
-    opacity: 0;
-}
-.game-container.visible .combo-wrap {
-    animation: flyInUp 0.5s var(--fly-ease) 0.75s both;
-}
-.combo-wrap .combo-num {
-    font-size: 1.5rem;
-    font-weight: 900;
-    background: linear-gradient(135deg, var(--accent), var(--accent2));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    display: inline-block;
-}
-.combo-wrap .combo-num.fly {
-    animation: comboFlyIn 0.4s var(--spring-ease);
-}
-.combo-wrap.high .combo-num {
-    animation: comboGlowFly 0.6s var(--smooth-ease) infinite;
-}
-
-@keyframes comboFlyIn {
-    0% { transform: translateY(25px) scale(0.5); opacity: 0; }
-    60% { transform: translateY(-3px) scale(1.2); opacity: 1; }
-    100% { transform: translateY(0) scale(1); opacity: 1; }
-}
-@keyframes comboGlowFly {
-    0%, 100% { filter: brightness(1); transform: scale(1); }
-    50% { filter: brightness(1.5); transform: scale(1.06); }
-}
-
-/* 反馈 */
-.feedback {
-    font-size: 1rem;
-    font-weight: 700;
-    min-height: 24px;
-    color: var(--text-secondary);
-    opacity: 0;
-}
-.game-container.visible .feedback {
-    animation: flyInUp 0.5s var(--fly-ease) 0.85s both;
-}
-.feedback.fly-correct {
-    color: var(--correct);
-    text-shadow: 0 0 15px var(--correct);
-    animation: feedbackFlyIn 0.35s var(--spring-ease);
-}
-.feedback.fly-error {
-    color: var(--error);
-    text-shadow: 0 0 15px var(--error);
-    animation: feedbackFlyIn 0.35s var(--spring-ease);
-}
-
-@keyframes feedbackFlyIn {
-    0% { transform: translateY(20px) scale(0.6); opacity: 0; }
-    60% { transform: translateY(-3px) scale(1.1); opacity: 1; }
-    100% { transform: translateY(0) scale(1); opacity: 1; }
-}
-
-/* 输入区域 */
-.input-area {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    opacity: 0;
-}
-.game-container.visible .input-area {
-    animation: flyInUp 0.6s var(--fly-ease) 0.95s both;
-}
-.input-field {
-    width: 100%;
-    padding: 14px 16px;
-    font-size: 1.5rem;
-    font-weight: 700;
-    text-align: center;
-    background: var(--input-bg);
-    border: 2px solid var(--input-border);
-    border-radius: 14px;
-    color: var(--text);
-    outline: none;
-    transition: all 0.2s var(--smooth-ease);
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    caret-color: var(--accent);
-    backdrop-filter: blur(22px) saturate(1.4) brightness(1.05);
-    -webkit-backdrop-filter: blur(22px) saturate(1.4) brightness(1.05);
-    box-shadow: 0 0 15px rgba(255, 255, 255, 0.04) inset, 0 4px 12px rgba(0, 0, 0, 0.1);
-    will-change: backdrop-filter;
-}
-.input-field:focus {
-    border-color: var(--accent);
-    box-shadow: 0 0 25px rgba(124, 58, 237, 0.4), 0 0 15px rgba(255, 255, 255, 0.1) inset;
-}
-.input-field.fly-correct {
-    border-color: var(--correct);
-    box-shadow: 0 0 35px rgba(0, 230, 118, 0.5);
-    animation: inputFlyCorrect 0.4s var(--spring-ease);
-}
-.input-field.fly-error {
-    border-color: var(--error);
-    box-shadow: 0 0 35px rgba(255, 51, 85, 0.6);
-    animation: inputFlyError 0.45s var(--smooth-ease);
-}
-.input-hint {
-    font-size: 0.75rem;
-    color: var(--text-secondary);
-    text-align: center;
-    letter-spacing: 0.3px;
-    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
-}
-
-@keyframes inputFlyCorrect {
-    0% { transform: translateY(15px) scale(0.97); }
-    50% { transform: translateY(-3px) scale(1.02); }
-    100% { transform: translateY(0) scale(1); }
-}
-@keyframes inputFlyError {
-    0% { transform: translateY(15px) translateX(0); }
-    20% { transform: translateY(0) translateX(-12px); }
-    40% { transform: translateX(10px); }
-    60% { transform: translateX(-6px); }
-    80% { transform: translateX(3px); }
-    100% { transform: translateX(0); }
-}
-
-/* 浮动文字 */
-.float-text {
-    position: fixed;
-    pointer-events: none;
-    font-weight: 900;
-    font-size: 1.6rem;
-    z-index: 50;
-    will-change: transform, opacity;
-    backface-visibility: hidden;
-    animation: floatUpFly 0.9s var(--fly-ease) forwards;
-}
-.float-text.positive {
-    color: var(--correct);
-    text-shadow: 0 0 25px var(--correct), 0 2px 10px rgba(0, 0, 0, 0.3);
-}
-.float-text.negative {
-    color: var(--error);
-    text-shadow: 0 0 25px var(--error), 0 2px 10px rgba(0, 0, 0, 0.3);
-}
-
-@keyframes floatUpFly {
-    0% { transform: translateY(20px) scale(0.5); opacity: 0; }
-    20% { transform: translateY(0) scale(1.2); opacity: 1; }
-    50% { transform: translateY(-35px) scale(1); opacity: 1; }
-    100% { transform: translateY(-80px) scale(0.7); opacity: 0; }
-}
-
-/* 按钮 */
-.btn {
-    padding: 12px 28px;
-    font-size: 0.95rem;
-    font-weight: 700;
-    border: none;
-    border-radius: 14px;
-    cursor: pointer;
-    transition: all 0.3s var(--spring-ease);
-    letter-spacing: 0.8px;
-    text-transform: uppercase;
-    font-family: inherit;
-    backdrop-filter: blur(14px) saturate(1.3);
-    -webkit-backdrop-filter: blur(14px) saturate(1.3);
-    opacity: 0;
-    will-change: transform, backdrop-filter;
-}
-.game-container.visible .btn {
-    animation: flyInUp 0.5s var(--fly-ease) 1.05s both;
-}
-.btn-primary {
-    background: linear-gradient(135deg, var(--accent), var(--accent2));
-    color: #fff;
-    box-shadow: 0 6px 20px rgba(124, 58, 237, 0.4);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-}
-.btn-primary:hover {
-    transform: translateY(-3px) scale(1.03);
-    box-shadow: 0 10px 30px rgba(124, 58, 237, 0.5);
-}
-.btn-primary:active {
-    transform: translateY(0) scale(0.95);
-    transition-duration: 0.06s;
-}
-.btn-secondary {
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid var(--card-border);
-    color: var(--text);
-    backdrop-filter: blur(20px) saturate(1.4);
-    -webkit-backdrop-filter: blur(20px) saturate(1.4);
-}
-.btn-secondary:hover {
-    background: rgba(255, 255, 255, 0.12);
-    transform: translateY(-3px) scale(1.03);
-}
-.btn:disabled {
-    opacity: 0.5 !important;
-    cursor: not-allowed;
-    transform: none !important;
-}
-
-/* 覆盖层 */
-.overlay {
-    position: absolute;
-    inset: 0;
-    background: var(--overlay-bg);
-    backdrop-filter: blur(22px) saturate(1.4) brightness(1.05);
-    -webkit-backdrop-filter: blur(22px) saturate(1.4) brightness(1.05);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 16px;
-    border-radius: 24px;
-    z-index: 10;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s var(--smooth-ease);
-    padding: 20px;
-    will-change: opacity, backdrop-filter;
-}
-.overlay.active {
-    opacity: 1;
-    pointer-events: all;
-}
-.overlay.active .overlay-title {
-    animation: flyInUp 0.5s var(--fly-ease) 0.05s both;
-}
-.overlay.active .overlay-subtitle {
-    animation: flyInUp 0.5s var(--fly-ease) 0.15s both;
-}
-.overlay.active .overlay-score {
-    animation: flyInUp 0.6s var(--fly-ease) 0.25s both;
-}
-.overlay.active .overlay-stats {
-    animation: flyInUp 0.5s var(--fly-ease) 0.35s both;
-}
-.overlay.active .btn-primary {
-    animation: flyInUp 0.5s var(--fly-ease) 0.45s both;
-}
-.overlay-title {
-    font-size: 1.8rem;
-    font-weight: 900;
-    background: linear-gradient(135deg, var(--accent), var(--accent2));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    letter-spacing: -0.5px;
-    text-align: center;
-    filter: drop-shadow(0 2px 10px rgba(124, 58, 237, 0.35));
-}
-.overlay-subtitle {
-    font-size: 0.95rem;
-    color: var(--text-secondary);
-    text-align: center;
-    line-height: 1.5;
-    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.15);
-}
-.overlay-score {
-    font-size: 3.8rem;
-    font-weight: 900;
-    letter-spacing: -1px;
-    text-shadow: 0 0 35px rgba(124, 58, 237, 0.55), 0 2px 12px rgba(0, 0, 0, 0.18);
-}
-.overlay-stats {
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-    justify-content: center;
-    font-size: 0.85rem;
-    color: var(--text-secondary);
-    font-weight: 600;
-}
-.overlay-stats span {
-    padding: 5px 12px;
-    background: rgba(255, 255, 255, 0.08);
-    border-radius: 16px;
-    border: 1px solid var(--card-border);
-    backdrop-filter: blur(14px) saturate(1.3);
-    -webkit-backdrop-filter: blur(14px) saturate(1.3);
-}
-
-/* 飞入动画 */
-@keyframes flyInUp {
-    0% {
-        transform: translateY(var(--fly-distance)) scale(0.9);
-        opacity: 0;
-    }
-    100% {
-        transform: translateY(0) scale(1);
-        opacity: 1;
-    }
-}
-@keyframes flyInDown {
-    0% {
-        transform: translateY(calc(var(--fly-distance) * -0.6)) scale(0.95);
-        opacity: 0;
-    }
-    100% {
-        transform: translateY(0) scale(1);
-        opacity: 1;
-    }
-}
-
-/* ========== 响应式 ========== */
-@media (min-width: 768px) {
-    .game-container {
-        max-width: 500px;
-        padding: 40px 24px;
-        gap: 20px;
-    }
-    .card {
-        padding: 32px 28px;
-        border-radius: 28px;
-        gap: 22px;
-    }
-    .timer-display {
-        font-size: 3.8rem;
-    }
-    .score-display {
-        font-size: 5rem;
-    }
-    .input-field {
-        font-size: 1.7rem;
-        padding: 16px 20px;
-    }
-    .game-title {
-        font-size: 1.8rem;
-    }
-    .overlay-title {
-        font-size: 2rem;
-    }
-    .overlay-score {
-        font-size: 4.2rem;
-    }
-    .splash-logo {
-        font-size: 5rem;
-    }
-    .splash-btn {
-        padding: 20px 56px;
-        font-size: 1.3rem;
-    }
-}
-
-@media (max-width: 380px) {
-    :root {
-        --fly-distance: 40px;
-        --glass-blur: 24px;
-    }
-    .timer-display {
-        font-size: 2.5rem;
-    }
-    .score-display {
-        font-size: 3.2rem;
-    }
-    .input-field {
-        font-size: 1.2rem;
-        padding: 10px 12px;
-    }
-    .card {
-        padding: 16px 14px;
-        gap: 12px;
-    }
-    .game-title {
-        font-size: 1.2rem;
-    }
-    .splash-logo {
-        font-size: 3rem;
-    }
-    .splash-btn {
-        padding: 14px 36px;
-        font-size: 1rem;
-    }
-}
-
-@media (prefers-reduced-motion: reduce) {
-    *,
-    *::before,
-    *::after {
-        animation-duration: 0.01ms !important;
-        transition-duration: 0.01ms !important;
-    }
-}
-/* ========== 名字输入框 ========== */
-.name-input {
-    width: 100%;
-    max-width: 240px;
-    padding: 10px 16px;
-    font-size: 0.95rem;
-    font-weight: 700;
-    text-align: center;
-    background: var(--input-bg);
-    border: 2px solid var(--input-border);
-    border-radius: 12px;
-    color: var(--text);
-    outline: none;
-    transition: all 0.2s var(--smooth-ease);
-    letter-spacing: 1px;
-    backdrop-filter: blur(22px) saturate(1.4) brightness(1.05);
-    -webkit-backdrop-filter: blur(22px) saturate(1.4) brightness(1.05);
-    box-shadow: 0 0 15px rgba(255, 255, 255, 0.04) inset;
-}
-.name-input:focus {
-    border-color: var(--accent);
-    box-shadow: 0 0 25px rgba(124, 58, 237, 0.4);
-}
-.name-input::placeholder {
-    color: var(--text-secondary);
-    opacity: 0.7;
-    font-weight: 500;
-}
-
-/* ========== 排行榜 ========== */
-.leaderboard {
-    width: 100%;
-    max-height: 170px;
-    overflow-y: auto;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid var(--card-border);
-    border-radius: 14px;
-    padding: 10px 12px;
-    backdrop-filter: blur(16px) saturate(1.3);
-    -webkit-backdrop-filter: blur(16px) saturate(1.3);
-}
-.leaderboard-title {
-    font-size: 0.85rem;
-    font-weight: 800;
-    color: var(--text-secondary);
-    letter-spacing: 1px;
-    margin-bottom: 8px;
-    text-align: center;
-}
-.leaderboard-list {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-.leaderboard-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 6px 10px;
-    border-radius: 10px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    background: rgba(255, 255, 255, 0.04);
-    transition: background 0.2s ease;
-}
-.leaderboard-item.top-1 {
-    background: linear-gradient(135deg, rgba(255, 215, 0, 0.25), rgba(255, 215, 0, 0.08));
-    border: 1px solid rgba(255, 215, 0, 0.4);
-}
-.leaderboard-item.top-2 {
-    background: linear-gradient(135deg, rgba(192, 192, 192, 0.2), rgba(192, 192, 192, 0.06));
-    border: 1px solid rgba(192, 192, 192, 0.35);
-}
-.leaderboard-item.top-3 {
-    background: linear-gradient(135deg, rgba(205, 127, 50, 0.2), rgba(205, 127, 50, 0.06));
-    border: 1px solid rgba(205, 127, 50, 0.35);
-}
-.leaderboard-item .rank {
-    width: 24px;
-    text-align: center;
-    font-weight: 900;
-    color: var(--accent);
-    flex-shrink: 0;
-}
-.leaderboard-item .lb-name {
-    font-weight: 800;
-    color: var(--text);
-    max-width: 80px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    flex-shrink: 0;
-}
-.leaderboard-item .lb-score {
-    font-weight: 900;
-    font-size: 1rem;
-    color: var(--text);
-    flex-shrink: 0;
-    margin-left: auto;
-}
-.leaderboard-item .lb-detail {
-    font-size: 0.7rem;
-    color: var(--text-secondary);
-    white-space: nowrap;
-}
-.leaderboard-empty {
-    text-align: center;
-    font-size: 0.8rem;
-    color: var(--text-secondary);
-    padding: 12px 0;
-    opacity: 0.7;
-}
-/* ========== 灵动岛 ========== */
+/* 灵动岛 */
 .dynamic-island {
     position: fixed;
     top: 16px;
@@ -1010,66 +155,256 @@ body {
     user-select: none;
     -webkit-tap-highlight-color: transparent;
 }
-.dynamic-island.expanded {
-    width: 250px;
-    height: 56px;
-    border-radius: 28px;
-    cursor: default;
-    padding: 6px 10px;
-}
-/* 折叠状态图标 */
-.island-collapsed {
-    position: absolute;
-    font-size: 1.5rem;
-    transition: opacity 0.3s ease;
-    animation: islandPulse 2s infinite;
-    color: #fff;
-}
-.dynamic-island.expanded .island-collapsed {
-    opacity: 0;
-    pointer-events: none;
-}
-/* 展开状态内容 */
-.island-expanded {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    width: 100%;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s ease 0.2s;
-}
-.dynamic-island.expanded .island-expanded {
-    opacity: 1;
-    pointer-events: all;
-}
+.dynamic-island.expanded { width: 260px; height: 56px; border-radius: 28px; cursor: default; padding: 6px 10px; }
+.island-collapsed { position: absolute; font-size: 1.5rem; transition: opacity 0.3s ease; animation: islandPulse 2s infinite; color: #fff; }
+.dynamic-island.expanded .island-collapsed { opacity: 0; pointer-events: none; }
+.island-expanded { display: flex; align-items: center; gap: 8px; width: 100%; opacity: 0; pointer-events: none; transition: opacity 0.3s ease 0.2s; }
+.dynamic-island.expanded .island-expanded { opacity: 1; pointer-events: all; }
 .island-btn {
-    background: rgba(255, 255, 255, 0.15);
-    border: none;
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    font-size: 1rem;
-    color: #fff;
-    transition: all 0.2s;
-    flex-shrink: 0;
+    background: rgba(255, 255, 255, 0.15); border: none; border-radius: 50%; width: 40px; height: 40px;
+    display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1rem; color: #fff;
+    transition: all 0.2s; flex-shrink: 0;
 }
 .island-btn:hover { background: rgba(255, 255, 255, 0.3); transform: scale(1.05); }
 .island-btn:active { transform: scale(0.9); }
-.island-text {
-    color: #fff;
-    font-size: 0.75rem;
-    font-weight: 700;
-    flex: 1;
-    text-align: center;
-    white-space: nowrap;
-    text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+.island-text { color: #fff; font-size: 0.75rem; font-weight: 700; flex: 1; text-align: center; white-space: nowrap; text-shadow: 0 1px 4px rgba(0,0,0,0.5); }
+@keyframes islandPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.15); } }
+
+/* 启动画面 */
+.splash-screen {
+    position: fixed; inset: 0; z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 24px; background: rgba(10, 10, 25, 0.55); backdrop-filter: blur(30px) saturate(1.5) brightness(1.05);
+    -webkit-backdrop-filter: blur(30px) saturate(1.5) brightness(1.05); transition: all 0.5s var(--fly-ease);
+    will-change: opacity, transform, backdrop-filter; padding: 20px;
 }
-@keyframes islandPulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.15); }
+[data-theme="light"] .splash-screen { background: rgba(255, 255, 255, 0.45); backdrop-filter: blur(35px) saturate(1.7) brightness(1.02); -webkit-backdrop-filter: blur(35px) saturate(1.7) brightness(1.02); }
+.splash-screen.hidden { opacity: 0; pointer-events: none; transform: translateY(-30px); }
+.splash-logo {
+    font-size: 4rem; font-weight: 900; background: linear-gradient(135deg, var(--accent), var(--accent2), var(--accent3));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; letter-spacing: -3px;
+    animation: logoFloat 2.5s ease-in-out infinite, logoFlyIn 1s var(--fly-ease) 0.2s both; will-change: transform;
+}
+.splash-subtitle { font-size: 1.1rem; color: var(--text-secondary); letter-spacing: 2px; font-weight: 600; animation: subtitleFlyIn 0.8s var(--fly-ease) 0.5s both; text-shadow: 0 1px 6px rgba(0, 0, 0, 0.2); }
+.splash-hint { font-size: 0.85rem; color: var(--text-secondary); opacity: 0.75; animation: subtitleFlyIn 0.8s var(--fly-ease) 0.7s both; text-shadow: 0 1px 6px rgba(0, 0, 0, 0.15); }
+.splash-btn {
+    padding: 18px 48px; font-size: 1.15rem; font-weight: 800; border: none; border-radius: 16px; cursor: pointer;
+    letter-spacing: 2px; font-family: inherit; background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #fff;
+    box-shadow: 0 8px 30px rgba(124, 58, 237, 0.5), 0 0 30px rgba(124, 58, 237, 0.3) inset;
+    border: 1px solid rgba(255, 255, 255, 0.2); transition: all 0.3s var(--spring-ease); animation: splashBtnFlyIn 0.9s var(--fly-ease) 0.9s both; will-change: transform;
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+}
+.splash-btn:hover { transform: translateY(-4px) scale(1.04); box-shadow: 0 14px 40px rgba(124, 58, 237, 0.6), 0 0 40px rgba(124, 58, 237, 0.4) inset; }
+.splash-btn:active { transform: translateY(0) scale(0.95); transition-duration: 0.06s; }
+
+@keyframes logoFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+@keyframes logoFlyIn { 0% { transform: translateY(60px) scale(0.7); opacity: 0; } 100% { transform: translateY(0) scale(1); opacity: 1; } }
+@keyframes subtitleFlyIn { 0% { transform: translateY(30px); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
+@keyframes splashBtnFlyIn { 0% { transform: translateY(50px) scale(0.7); opacity: 0; } 100% { transform: translateY(0) scale(1); opacity: 1; } }
+
+/* 游戏主容器 */
+.game-container {
+    position: relative; z-index: 1; width: 100%; max-width: 480px; padding: 24px 20px;
+    display: flex; flex-direction: column; align-items: center; gap: 14px; transform: translateZ(0);
+    opacity: 0; pointer-events: none; transition: opacity 0.4s ease;
+}
+.game-container.visible { opacity: 1; pointer-events: all; }
+
+/* 顶栏 */
+.top-bar { width: 100%; display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; opacity: 0; }
+.game-container.visible .top-bar { animation: flyInDown 0.6s var(--fly-ease) 0.1s both; }
+.game-title {
+    font-size: 1.6rem; font-weight: 800; background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; letter-spacing: -0.5px;
+    filter: drop-shadow(0 2px 8px rgba(124, 58, 237, 0.35));
+}
+.theme-btn {
+    width: 42px; height: 42px; border-radius: 50%; border: 1px solid var(--card-border); background: var(--card-bg);
+    backdrop-filter: blur(28px) saturate(1.5) brightness(1.08); -webkit-backdrop-filter: blur(28px) saturate(1.5) brightness(1.08);
+    cursor: pointer; font-size: 0.85rem; font-weight: 700; display: flex; align-items: center; justify-content: center;
+    transition: all 0.3s var(--spring-ease); color: var(--text); letter-spacing: 0.5px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(255, 255, 255, 0.06) inset; will-change: transform;
+}
+.theme-btn:hover { transform: scale(1.08); box-shadow: 0 6px 22px rgba(0, 0, 0, 0.28), 0 0 0 1px rgba(255, 255, 255, 0.1) inset; }
+.theme-btn:active { transform: scale(0.92); transition-duration: 0.06s; }
+
+/* 主卡片 */
+.card {
+    width: 100%; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 24px; padding: 24px 20px;
+    backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
+    box-shadow: var(--shadow); display: flex; flex-direction: column; align-items: center; gap: 18px;
+    position: relative; overflow: hidden; transform: translateZ(0); backface-visibility: hidden; opacity: 0;
+    will-change: backdrop-filter, transform; transition: background 0.4s ease, border-color 0.4s ease, backdrop-filter 0.4s ease;
+}
+.game-container.visible .card { animation: flyInUp 0.9s var(--fly-ease) 0.3s both; }
+.card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 50%;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0) 100%);
+    pointer-events: none; border-radius: 24px 24px 50% 50% / 24px 24px 30% 30%; opacity: 0.35; mix-blend-mode: overlay; z-index: 0;
+}
+.card::after {
+    content: ''; position: absolute; inset: -1px; border-radius: 24px; padding: 1px;
+    background: linear-gradient(135deg, var(--card-border-highlight), transparent 40%, transparent 60%, var(--card-border-highlight));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); -webkit-mask-composite: xor; mask-composite: exclude;
+    pointer-events: none; opacity: 0.5; z-index: 0;
+}
+.card > * { position: relative; z-index: 1; }
+
+/* 计时器 */
+.timer-section { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 6px; opacity: 0; }
+.game-container.visible .timer-section { animation: flyInUp 0.6s var(--fly-ease) 0.55s both; }
+.timer-display {
+    font-size: 3.2rem; font-weight: 900; line-height: 1; letter-spacing: -1px; font-variant-numeric: tabular-nums;
+    transition: color 0.2s var(--smooth-ease); display: inline-block; text-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+}
+[data-theme="light"] .timer-display { text-shadow: 0 2px 10px rgba(255, 255, 255, 0.5); }
+.timer-display.urgent { color: var(--timer-urgent); animation: pulseSmooth 0.5s var(--smooth-ease) infinite; }
+.timer-bar { width: 100%; height: 5px; background: rgba(255, 255, 255, 0.12); border-radius: 3px; overflow: hidden; box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15) inset; }
+.timer-bar-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2), var(--accent3)); border-radius: 3px; transition: width 0.05s linear; will-change: width; }
+.timer-bar-fill.urgent { background: var(--timer-urgent); box-shadow: 0 0 10px var(--timer-urgent); }
+@keyframes pulseSmooth { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.05); opacity: 0.7; } }
+
+/* 分数 */
+.score-section { display: flex; flex-direction: column; align-items: center; opacity: 0; }
+.game-container.visible .score-section { animation: flyInUp 0.6s var(--fly-ease) 0.65s both; }
+.score-display {
+    font-size: 4.5rem; font-weight: 900; line-height: 1; letter-spacing: -2px;
+    text-shadow: 0 0 35px rgba(124, 58, 237, 0.55), 0 2px 12px rgba(0, 0, 0, 0.18); display: inline-block;
+}
+[data-theme="light"] .score-display { text-shadow: 0 0 35px rgba(124, 58, 237, 0.35), 0 2px 10px rgba(255, 255, 255, 0.4); }
+.score-display.fly-pop { animation: flyPopIn 0.5s var(--spring-ease); }
+.score-display.fly-shake { animation: flyShakeIn 0.45s var(--smooth-ease); }
+@keyframes flyPopIn { 0% { transform: translateY(40px) scale(0.6); opacity: 0; } 60% { transform: translateY(-5px) scale(1.1); opacity: 1; } 100% { transform: translateY(0) scale(1); opacity: 1; } }
+@keyframes flyShakeIn { 0% { transform: translateY(30px) translateX(0); opacity: 0; } 20% { transform: translateY(0) translateX(-12px); opacity: 1; } 40% { transform: translateX(10px); } 60% { transform: translateX(-6px); } 80% { transform: translateX(3px); } 100% { transform: translateX(0); } }
+
+/* 连击 */
+.combo-wrap { font-size: 1.1rem; font-weight: 700; color: var(--text-secondary); display: flex; align-items: center; gap: 6px; min-height: 28px; opacity: 0; }
+.game-container.visible .combo-wrap { animation: flyInUp 0.5s var(--fly-ease) 0.75s both; }
+.combo-wrap .combo-num {
+    font-size: 1.5rem; font-weight: 900; background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; display: inline-block;
+}
+.combo-wrap .combo-num.fly { animation: comboFlyIn 0.4s var(--spring-ease); }
+.combo-wrap.high .combo-num { animation: comboGlowFly 0.6s var(--smooth-ease) infinite; }
+@keyframes comboFlyIn { 0% { transform: translateY(25px) scale(0.5); opacity: 0; } 60% { transform: translateY(-3px) scale(1.2); opacity: 1; } 100% { transform: translateY(0) scale(1); opacity: 1; } }
+@keyframes comboGlowFly { 0%, 100% { filter: brightness(1); transform: scale(1); } 50% { filter: brightness(1.5); transform: scale(1.06); } }
+
+/* 反馈 */
+.feedback { font-size: 1rem; font-weight: 700; min-height: 24px; color: var(--text-secondary); opacity: 0; }
+.game-container.visible .feedback { animation: flyInUp 0.5s var(--fly-ease) 0.85s both; }
+.feedback.fly-correct { color: var(--correct); text-shadow: 0 0 15px var(--correct); animation: feedbackFlyIn 0.35s var(--spring-ease); }
+.feedback.fly-error { color: var(--error); text-shadow: 0 0 15px var(--error); animation: feedbackFlyIn 0.35s var(--spring-ease); }
+@keyframes feedbackFlyIn { 0% { transform: translateY(20px) scale(0.6); opacity: 0; } 60% { transform: translateY(-3px) scale(1.1); opacity: 1; } 100% { transform: translateY(0) scale(1); opacity: 1; } }
+
+/* 输入区域 */
+.input-area { width: 100%; display: flex; flex-direction: column; gap: 6px; opacity: 0; }
+.game-container.visible .input-area { animation: flyInUp 0.6s var(--fly-ease) 0.95s both; }
+.input-field {
+    width: 100%; padding: 14px 16px; font-size: 1.5rem; font-weight: 700; text-align: center;
+    background: var(--input-bg); border: 2px solid var(--input-border); border-radius: 14px; color: var(--text);
+    outline: none; transition: all 0.2s var(--smooth-ease); letter-spacing: 3px; text-transform: uppercase;
+    caret-color: var(--accent); backdrop-filter: blur(22px) saturate(1.4) brightness(1.05); -webkit-backdrop-filter: blur(22px) saturate(1.4) brightness(1.05);
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.04) inset, 0 4px 12px rgba(0, 0, 0, 0.1); will-change: backdrop-filter;
+}
+.input-field:focus { border-color: var(--accent); box-shadow: 0 0 25px rgba(124, 58, 237, 0.4), 0 0 15px rgba(255, 255, 255, 0.1) inset; }
+.input-field.fly-correct { border-color: var(--correct); box-shadow: 0 0 35px rgba(0, 230, 118, 0.5); animation: inputFlyCorrect 0.4s var(--spring-ease); }
+.input-field.fly-error { border-color: var(--error); box-shadow: 0 0 35px rgba(255, 51, 85, 0.6); animation: inputFlyError 0.45s var(--smooth-ease); }
+.input-hint { font-size: 0.75rem; color: var(--text-secondary); text-align: center; letter-spacing: 0.3px; text-shadow: 0 1px 4px rgba(0, 0, 0, 0.15); }
+@keyframes inputFlyCorrect { 0% { transform: translateY(15px) scale(0.97); } 50% { transform: translateY(-3px) scale(1.02); } 100% { transform: translateY(0) scale(1); } }
+@keyframes inputFlyError { 0% { transform: translateY(15px) translateX(0); } 20% { transform: translateY(0) translateX(-12px); } 40% { transform: translateX(10px); } 60% { transform: translateX(-6px); } 80% { transform: translateX(3px); } 100% { transform: translateX(0); } }
+
+/* 浮动文字 */
+.float-text {
+    position: fixed; pointer-events: none; font-weight: 900; font-size: 1.6rem; z-index: 50;
+    will-change: transform, opacity; backface-visibility: hidden; animation: floatUpFly 0.9s var(--fly-ease) forwards;
+}
+.float-text.positive { color: var(--correct); text-shadow: 0 0 25px var(--correct), 0 2px 10px rgba(0, 0, 0, 0.3); }
+.float-text.negative { color: var(--error); text-shadow: 0 0 25px var(--error), 0 2px 10px rgba(0, 0, 0, 0.3); }
+@keyframes floatUpFly { 0% { transform: translateY(20px) scale(0.5); opacity: 0; } 20% { transform: translateY(0) scale(1.2); opacity: 1; } 50% { transform: translateY(-35px) scale(1); opacity: 1; } 100% { transform: translateY(-80px) scale(0.7); opacity: 0; } }
+
+/* 按钮 */
+.btn {
+    padding: 12px 28px; font-size: 0.95rem; font-weight: 700; border: none; border-radius: 14px; cursor: pointer;
+    transition: all 0.3s var(--spring-ease); letter-spacing: 0.8px; text-transform: uppercase; font-family: inherit;
+    backdrop-filter: blur(14px) saturate(1.3); -webkit-backdrop-filter: blur(14px) saturate(1.3); opacity: 0; will-change: transform, backdrop-filter;
+}
+.game-container.visible .btn { animation: flyInUp 0.5s var(--fly-ease) 1.05s both; }
+.btn-primary { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #fff; box-shadow: 0 6px 20px rgba(124, 58, 237, 0.4); border: 1px solid rgba(255, 255, 255, 0.2); }
+.btn-primary:hover { transform: translateY(-3px) scale(1.03); box-shadow: 0 10px 30px rgba(124, 58, 237, 0.5); }
+.btn-primary:active { transform: translateY(0) scale(0.95); transition-duration: 0.06s; }
+.btn-secondary { background: rgba(255, 255, 255, 0.06); border: 1px solid var(--card-border); color: var(--text); backdrop-filter: blur(20px) saturate(1.4); -webkit-backdrop-filter: blur(20px) saturate(1.4); }
+.btn-secondary:hover { background: rgba(255, 255, 255, 0.12); transform: translateY(-3px) scale(1.03); }
+.btn:disabled { opacity: 0.5 !important; cursor: not-allowed; transform: none !important; }
+
+/* 覆盖层 */
+.overlay {
+    position: absolute; inset: 0; background: var(--overlay-bg); backdrop-filter: blur(22px) saturate(1.4) brightness(1.05);
+    -webkit-backdrop-filter: blur(22px) saturate(1.4) brightness(1.05); display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 16px; border-radius: 24px; z-index: 10; opacity: 0; pointer-events: none; transition: opacity 0.3s var(--smooth-ease);
+    padding: 20px; will-change: opacity, backdrop-filter;
+}
+.overlay.active { opacity: 1; pointer-events: all; }
+.overlay.active .overlay-title { animation: flyInUp 0.5s var(--fly-ease) 0.05s both; }
+.overlay.active .overlay-subtitle { animation: flyInUp 0.5s var(--fly-ease) 0.15s both; }
+.overlay.active .overlay-score { animation: flyInUp 0.6s var(--fly-ease) 0.25s both; }
+.overlay.active .overlay-stats { animation: flyInUp 0.5s var(--fly-ease) 0.35s both; }
+.overlay.active .btn-primary { animation: flyInUp 0.5s var(--fly-ease) 0.45s both; }
+.overlay-title { font-size: 1.8rem; font-weight: 900; background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; letter-spacing: -0.5px; text-align: center; filter: drop-shadow(0 2px 10px rgba(124, 58, 237, 0.35)); }
+.overlay-subtitle { font-size: 0.95rem; color: var(--text-secondary); text-align: center; line-height: 1.5; text-shadow: 0 1px 6px rgba(0, 0, 0, 0.15); }
+.overlay-score { font-size: 3.8rem; font-weight: 900; letter-spacing: -1px; text-shadow: 0 0 35px rgba(124, 58, 237, 0.55), 0 2px 12px rgba(0, 0, 0, 0.18); }
+.overlay-stats { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; font-size: 0.85rem; color: var(--text-secondary); font-weight: 600; }
+.overlay-stats span { padding: 5px 12px; background: rgba(255, 255, 255, 0.08); border-radius: 16px; border: 1px solid var(--card-border); backdrop-filter: blur(14px) saturate(1.3); -webkit-backdrop-filter: blur(14px) saturate(1.3); }
+
+/* 名字输入框 */
+.name-input {
+    width: 100%; max-width: 240px; padding: 10px 16px; font-size: 0.95rem; font-weight: 700; text-align: center;
+    background: var(--input-bg); border: 2px solid var(--input-border); border-radius: 12px; color: var(--text); outline: none;
+    transition: all 0.2s var(--smooth-ease); letter-spacing: 1px; backdrop-filter: blur(22px) saturate(1.4) brightness(1.05);
+    -webkit-backdrop-filter: blur(22px) saturate(1.4) brightness(1.05); box-shadow: 0 0 15px rgba(255, 255, 255, 0.04) inset;
+}
+.name-input:focus { border-color: var(--accent); box-shadow: 0 0 25px rgba(124, 58, 237, 0.4); }
+.name-input::placeholder { color: var(--text-secondary); opacity: 0.7; font-weight: 500; }
+
+/* 上传按钮 */
+#uploadBtn {
+    width: 100%; max-width: 240px; padding: 12px 20px; font-size: 0.9rem; font-weight: 800;
+    border-radius: 14px; border: 1px solid var(--card-border); background: rgba(255, 255, 255, 0.08);
+    color: var(--text); cursor: pointer; transition: all 0.3s var(--spring-ease);
+    backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); letter-spacing: 0.5px;
+}
+#uploadBtn:hover:not(:disabled) { background: rgba(255, 255, 255, 0.15); transform: translateY(-2px) scale(1.02); }
+#uploadBtn:active:not(:disabled) { transform: scale(0.95); }
+#uploadBtn:disabled { cursor: not-allowed; opacity: 0.8; }
+#uploadBtn.success { background: rgba(0, 230, 118, 0.15); border-color: var(--correct); color: var(--correct); }
+#uploadBtn.error { background: rgba(255, 51, 85, 0.15); border-color: var(--error); color: var(--error); }
+
+/* 飞入动画 */
+@keyframes flyInUp { 0% { transform: translateY(var(--fly-distance)) scale(0.9); opacity: 0; } 100% { transform: translateY(0) scale(1); opacity: 1; } }
+@keyframes flyInDown { 0% { transform: translateY(calc(var(--fly-distance) * -0.6)) scale(0.95); opacity: 0; } 100% { transform: translateY(0) scale(1); opacity: 1; } }
+
+/* 响应式 */
+@media (min-width: 768px) {
+    .game-container { max-width: 500px; padding: 40px 24px; gap: 20px; }
+    .card { padding: 32px 28px; border-radius: 28px; gap: 22px; }
+    .timer-display { font-size: 3.8rem; }
+    .score-display { font-size: 5rem; }
+    .input-field { font-size: 1.7rem; padding: 16px 20px; }
+    .game-title { font-size: 1.8rem; }
+    .overlay-title { font-size: 2rem; }
+    .overlay-score { font-size: 4.2rem; }
+    .splash-logo { font-size: 5rem; }
+    .splash-btn { padding: 20px 56px; font-size: 1.3rem; }
+}
+@media (max-width: 380px) {
+    :root { --fly-distance: 40px; --glass-blur: 24px; }
+    .timer-display { font-size: 2.5rem; }
+    .score-display { font-size: 3.2rem; }
+    .input-field { font-size: 1.2rem; padding: 10px 12px; }
+    .card { padding: 16px 14px; gap: 12px; }
+    .game-title { font-size: 1.2rem; }
+    .splash-logo { font-size: 3rem; }
+    .splash-btn { padding: 14px 36px; font-size: 1rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
 }
