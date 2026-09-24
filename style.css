@@ -985,3 +985,91 @@ body {
     padding: 12px 0;
     opacity: 0.7;
 }
+/* ========== 灵动岛 ========== */
+.dynamic-island {
+    position: fixed;
+    top: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.78);
+    backdrop-filter: blur(24px) saturate(1.8);
+    -webkit-backdrop-filter: blur(24px) saturate(1.8);
+    border-radius: 30px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    padding: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 1000;
+    transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    overflow: hidden;
+    width: 56px;
+    height: 56px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+.dynamic-island.expanded {
+    width: 250px;
+    height: 56px;
+    border-radius: 28px;
+    cursor: default;
+    padding: 6px 10px;
+}
+/* 折叠状态图标 */
+.island-collapsed {
+    position: absolute;
+    font-size: 1.5rem;
+    transition: opacity 0.3s ease;
+    animation: islandPulse 2s infinite;
+    color: #fff;
+}
+.dynamic-island.expanded .island-collapsed {
+    opacity: 0;
+    pointer-events: none;
+}
+/* 展开状态内容 */
+.island-expanded {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease 0.2s;
+}
+.dynamic-island.expanded .island-expanded {
+    opacity: 1;
+    pointer-events: all;
+}
+.island-btn {
+    background: rgba(255, 255, 255, 0.15);
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 1rem;
+    color: #fff;
+    transition: all 0.2s;
+    flex-shrink: 0;
+}
+.island-btn:hover { background: rgba(255, 255, 255, 0.3); transform: scale(1.05); }
+.island-btn:active { transform: scale(0.9); }
+.island-text {
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    flex: 1;
+    text-align: center;
+    white-space: nowrap;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+}
+@keyframes islandPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+}

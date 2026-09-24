@@ -26,7 +26,13 @@
     const finalMaxCombo = document.getElementById('finalMaxCombo');
     const particlesContainer = document.getElementById('particles');
     const playerName = document.getElementById('playerName');
-    const leaderboardList = document.getElementById('leaderboardList');
+
+    // 灵动岛元素
+    const dynamicIsland = document.getElementById('dynamicIsland');
+    const playPauseBtn = document.getElementById('playPauseBtn');
+    const leaderboardBtn = document.getElementById('leaderboardBtn');
+    const bgMusic = document.getElementById('bgMusic');
+    const musicStatus = document.getElementById('musicStatus');
 
     // ========== 游戏常量与状态 ==========
     const GAME_DURATION = 60;
@@ -41,7 +47,6 @@
     let lastTimestamp = null;
     let feedbackTimeout = null;
     let lastTickSecond = GAME_DURATION;
-    let currentRecordId = null;
 
     // ========== 音频系统 ==========
     let audioCtx = null;
@@ -51,12 +56,8 @@
             if (!audioCtx) {
                 audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             }
-            if (audioCtx.state === 'suspended') {
-                audioCtx.resume();
-            }
-        } catch (e) {
-            console.warn('无法初始化音频上下文', e);
-        }
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+        } catch (e) { console.warn('无法初始化音频上下文', e); }
     }
 
     function playTone(freq, duration, type = 'sine', volume = 0.3, delay = 0) {
@@ -73,56 +74,28 @@
             gain.connect(audioCtx.destination);
             osc.start(audioCtx.currentTime + delay);
             osc.stop(audioCtx.currentTime + delay + duration + 0.05);
-        } catch (e) {
-            console.warn('播放音效失败', e);
-        }
+        } catch (e) { console.warn('播放音效失败', e); }
     }
 
-    function playCorrectSound() {
-        playTone(880, 0.08, 'triangle', 0.3);
-        setTimeout(() => playTone(1174.66, 0.06, 'triangle', 0.2, 0.05), 50);
-    }
-
-    function playErrorSound() {
-        playTone(220, 0.2, 'sawtooth', 0.15);
-    }
-
-    function playStartSound() {
-        playTone(500, 0.1, 'sine', 0.2);
-        setTimeout(() => playTone(700, 0.1, 'sine', 0.2, 0.1), 100);
-    }
-
-    function playGameOverSound() {
-        playTone(600, 0.2, 'triangle', 0.25);
-        setTimeout(() => playTone(400, 0.3, 'triangle', 0.2, 0.2), 200);
-    }
-
-    function playTickSound() {
-        playTone(1000, 0.03, 'sine', 0.1);
-    }
+    function playCorrectSound() { playTone(880, 0.08, 'triangle', 0.3); setTimeout(() => playTone(1174.66, 0.06, 'triangle', 0.2, 0.05), 50); }
+    function playErrorSound() { playTone(220, 0.2, 'sawtooth', 0.15); }
+    function playStartSound() { playTone(500, 0.1, 'sine', 0.2); setTimeout(() => playTone(700, 0.1, 'sine', 0.2, 0.1), 100); }
+    function playGameOverSound() { playTone(600, 0.2, 'triangle', 0.25); setTimeout(() => playTone(400, 0.3, 'triangle', 0.2, 0.2), 200); }
+    function playTickSound() { playTone(1000, 0.03, 'sine', 0.1); }
 
     // ========== 主题 ==========
-    function getTheme() {
-        return document.documentElement.getAttribute('data-theme') || 'dark';
-    }
-
+    function getTheme() { return document.documentElement.getAttribute('data-theme') || 'dark'; }
     function setTheme(theme) {
         document.documentElement.setAttribute('data-theme', theme);
         themeBtn.textContent = theme === 'dark' ? '暗' : '亮';
         try { localStorage.setItem('mj-theme', theme); } catch (e) {}
     }
-
-    function toggleTheme() {
-        setTheme(getTheme() === 'dark' ? 'light' : 'dark');
-    }
-
+    function toggleTheme() { setTheme(getTheme() === 'dark' ? 'light' : 'dark'); }
     try {
         const saved = localStorage.getItem('mj-theme');
         if (saved === 'light' || saved === 'dark') setTheme(saved);
         else setTheme('dark');
-    } catch (e) {
-        setTheme('dark');
-    }
+    } catch (e) { setTheme('dark'); }
     themeBtn.addEventListener('click', toggleTheme);
 
     // ========== 粒子背景 ==========
@@ -152,10 +125,8 @@
         el.textContent = text;
         const maxX = window.innerWidth - 80;
         const maxY = window.innerHeight * 0.5;
-        const x = 20 + Math.random() * maxX;
-        const y = 20 + Math.random() * maxY;
-        el.style.left = x + 'px';
-        el.style.top = y + 'px';
+        el.style.left = (20 + Math.random() * maxX) + 'px';
+        el.style.top = (20 + Math.random() * maxY) + 'px';
         document.body.appendChild(el);
         setTimeout(() => el.remove(), 900);
     }
@@ -179,93 +150,18 @@
         }, 1000);
     }
 
-    // ========== 在线排行榜 ==========
+    // ========== 在线提交分数 ==========
     async function submitScore(entry) {
         try {
-            const { data, error } = await supabase
-                .from('scores')
-                .insert([entry])
-                .select()
-                .single();
-            if (error) {
-                console.warn('提交失败', error);
-                return null;
-            }
+            const { data, error } = await supabase.from('scores').insert([entry]).select();
+            if (error) console.warn('提交失败', error);
             return data;
-        } catch (e) {
-            console.warn('提交异常', e);
-            return null;
-        }
-    }
-
-    async function updateScoreName(id, name) {
-        if (!id) return;
-        try {
-            const { error } = await supabase
-                .from('scores')
-                .update({ name: name })
-                .eq('id', id);
-            if (error) console.warn('更新名字失败', error);
-        } catch (e) {
-            console.warn('更新异常', e);
-        }
-    }
-
-    async function fetchTopScores(limit = 10) {
-        try {
-            const { data, error } = await supabase
-                .from('scores')
-                .select('*')
-                .order('score', { ascending: false })
-                .order('max_combo', { ascending: false })
-                .limit(limit);
-            if (error) {
-                console.warn('读取排行榜失败', error);
-                return [];
-            }
-            return data || [];
-        } catch (e) {
-            console.warn('读取异常', e);
-            return [];
-        }
-    }
-
-    async function renderOnlineLeaderboard() {
-        if (!leaderboardList) return;
-        leaderboardList.innerHTML = '<div class="leaderboard-empty">加载中...</div>';
-        const list = await fetchTopScores(10);
-        if (!list || list.length === 0) {
-            leaderboardList.innerHTML = '<div class="leaderboard-empty">暂无记录，快来抢第一！</div>';
-            return;
-        }
-        const medals = ['🥇', '🥈', '🥉'];
-        leaderboardList.innerHTML = list.map((item, i) => {
-            const rankClass = i < 3 ? ` top-${i + 1}` : '';
-            const rankText = i < 3 ? medals[i] : (i + 1);
-            const name = escapeHtml(item.name || '匿名玩家');
-            return `<div class="leaderboard-item${rankClass}">
-                <span class="rank">${rankText}</span>
-                <span class="lb-name">${name}</span>
-                <span class="lb-detail">连击${item.max_combo}</span>
-                <span class="lb-score">${item.score}</span>
-            </div>`;
-        }).join('');
-    }
-
-    function escapeHtml(str) {
-        return String(str)
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;')
-            .replace(/'/g, '&#39;');
+        } catch (e) { console.warn('提交异常', e); return null; }
     }
 
     // ========== 游戏逻辑 ==========
     function handleCorrect() {
-        score += 1;
-        correctCount++;
-        combo++;
+        score += 1; correctCount++; combo++;
         if (combo > maxCombo) maxCombo = combo;
         updateUI();
         playCorrectSound();
@@ -283,9 +179,7 @@
     }
 
     function handleError() {
-        score -= 2;
-        errorCount++;
-        combo = 0;
+        score -= 2; errorCount++; combo = 0;
         updateUI();
         playErrorSound();
         scoreDisplay.classList.remove('fly-pop', 'fly-shake');
@@ -313,79 +207,48 @@
 
     function tickTimer(timestamp) {
         if (!isPlaying) return;
-        if (lastTimestamp === null) {
-            lastTimestamp = timestamp;
-            animationId = requestAnimationFrame(tickTimer);
-            return;
-        }
+        if (lastTimestamp === null) { lastTimestamp = timestamp; animationId = requestAnimationFrame(tickTimer); return; }
         const delta = (timestamp - lastTimestamp) / 1000;
         lastTimestamp = timestamp;
         timeRemaining -= delta;
-        if (timeRemaining <= 0) {
-            timeRemaining = 0;
-            updateTimerDisplay();
-            endGame();
-            return;
-        }
+        if (timeRemaining <= 0) { timeRemaining = 0; updateTimerDisplay(); endGame(); return; }
         updateTimerDisplay();
         animationId = requestAnimationFrame(tickTimer);
     }
 
     function stopTimer() {
-        if (animationId) {
-            cancelAnimationFrame(animationId);
-            animationId = null;
-        }
+        if (animationId) { cancelAnimationFrame(animationId); animationId = null; }
         lastTimestamp = null;
     }
 
     function updateTimerDisplay() {
         const sec = Math.ceil(timeRemaining);
         timerDisplay.textContent = sec;
-        const pct = (timeRemaining / GAME_DURATION) * 100;
-        timerBarFill.style.width = pct + '%';
+        timerBarFill.style.width = ((timeRemaining / GAME_DURATION) * 100) + '%';
         const urgent = timeRemaining <= 10;
         timerDisplay.classList.toggle('urgent', urgent);
         timerBarFill.classList.toggle('urgent', urgent);
-
-        if (isPlaying && sec <= 5 && sec !== lastTickSecond && sec > 0) {
-            playTickSound();
-            lastTickSecond = sec;
-        }
+        if (isPlaying && sec <= 5 && sec !== lastTickSecond && sec > 0) { playTickSound(); lastTickSecond = sec; }
     }
 
     // ========== 游戏流程 ==========
     function startGame() {
-        initAudio();
-        playStartSound();
-        score = 0;
-        combo = 0;
-        maxCombo = 0;
-        correctCount = 0;
-        errorCount = 0;
-        timeRemaining = GAME_DURATION;
-        lastTickSecond = GAME_DURATION;
-        currentRecordId = null;
+        initAudio(); playStartSound();
+        score = 0; combo = 0; maxCombo = 0; correctCount = 0; errorCount = 0;
+        timeRemaining = GAME_DURATION; lastTickSecond = GAME_DURATION;
         isPlaying = true;
-        updateUI();
-        updateTimerDisplay();
+        updateUI(); updateTimerDisplay();
         feedback.className = 'feedback';
         feedback.textContent = '输入 "MJ" 开始得分';
-        inputField.disabled = false;
-        inputField.value = '';
-        inputField.focus();
+        inputField.disabled = false; inputField.value = ''; inputField.focus();
         endOverlay.classList.remove('active');
         restartBtn.style.display = 'block';
         startTimer();
     }
 
     function endGame() {
-        isPlaying = false;
-        stopTimer();
-        playGameOverSound();
-        inputField.disabled = true;
-        inputField.value = '';
-
+        isPlaying = false; stopTimer(); playGameOverSound();
+        inputField.disabled = true; inputField.value = '';
         finalScore.textContent = score;
         finalCorrect.textContent = correctCount;
         finalError.textContent = errorCount;
@@ -398,7 +261,6 @@
         else if (score >= 0) finalMessage.textContent = '刚刚起步！';
         else finalMessage.textContent = '再试一次吧！';
 
-        // 恢复上次用的名字
         try {
             const savedName = localStorage.getItem('mj-player-name');
             if (savedName) playerName.value = savedName;
@@ -407,72 +269,43 @@
         endOverlay.classList.add('active');
         restartBtn.style.display = 'none';
 
-        // 提交成绩
         const name = (playerName.value || '').trim() || '匿名玩家';
         try { localStorage.setItem('mj-player-name', name); } catch (e) {}
-
-        submitScore({
-            name: name,
-            score: score,
-            correct: correctCount,
-            error: errorCount,
-            max_combo: maxCombo
-        }).then((record) => {
-            if (record && record.id) currentRecordId = record.id;
-            renderOnlineLeaderboard();
-        });
+        submitScore({ name: name, score: score, correct: correctCount, error: errorCount, max_combo: maxCombo });
     }
 
     function resetAndStart() {
-        stopTimer();
-        isPlaying = false;
-        score = 0;
-        combo = 0;
-        maxCombo = 0;
-        correctCount = 0;
-        errorCount = 0;
+        stopTimer(); isPlaying = false;
+        score = 0; combo = 0; maxCombo = 0; correctCount = 0; errorCount = 0;
         timeRemaining = GAME_DURATION;
-        currentRecordId = null;
-        updateUI();
-        updateTimerDisplay();
+        updateUI(); updateTimerDisplay();
         feedback.className = 'feedback';
         feedback.textContent = '输入 "MJ" 开始得分';
-        inputField.disabled = true;
-        inputField.value = '';
+        inputField.disabled = true; inputField.value = '';
         endOverlay.classList.remove('active');
         restartBtn.style.display = 'none';
         startGame();
     }
 
-    // ========== 事件监听 ==========
+    // ========== 游戏事件监听 ==========
     splashBtn.addEventListener('click', function() {
         splashScreen.classList.add('hidden');
         gameContainer.classList.add('visible');
-        setTimeout(() => {
-            splashScreen.style.display = 'none';
-        }, 600);
+        setTimeout(() => { splashScreen.style.display = 'none'; }, 600);
         startGame();
-        setTimeout(() => {
-            if (isPlaying) inputField.focus();
-        }, 1100);
+        setTimeout(() => { if (isPlaying) inputField.focus(); }, 1100);
     });
 
     inputField.addEventListener('input', function() {
         if (!isPlaying) return;
         const val = inputField.value.trim().toLowerCase();
-        if (val === 'mj') {
-            handleCorrect();
-            inputField.value = '';
-        } else if (val.length >= 3) {
-            handleError();
-            inputField.value = '';
-        }
+        if (val === 'mj') { handleCorrect(); inputField.value = ''; }
+        else if (val.length >= 3) { handleError(); inputField.value = ''; }
     });
 
     inputField.addEventListener('keydown', function(e) {
         if (e.key === 'Enter') {
-            e.preventDefault();
-            if (!isPlaying) return;
+            e.preventDefault(); if (!isPlaying) return;
             const val = inputField.value.trim().toLowerCase();
             if (val === 'mj') handleCorrect();
             else if (val.length > 0) handleError();
@@ -481,7 +314,7 @@
     });
 
     document.getElementById('card').addEventListener('click', function(e) {
-        if (isPlaying && !e.target.closest('.input-field') && !e.target.closest('.btn') && !e.target.closest('.theme-btn') && !e.target.closest('.name-input') && !e.target.closest('.leaderboard')) {
+        if (isPlaying && !e.target.closest('.input-field') && !e.target.closest('.btn') && !e.target.closest('.theme-btn') && !e.target.closest('.name-input')) {
             inputField.focus();
         }
     });
@@ -489,29 +322,50 @@
     playAgainBtn.addEventListener('click', startGame);
     restartBtn.addEventListener('click', resetAndStart);
 
-    // 名字改变时更新刚才提交的那条记录
     let nameUpdateTimeout = null;
     playerName.addEventListener('input', function() {
         const name = (playerName.value || '').trim() || '匿名玩家';
         try { localStorage.setItem('mj-player-name', name); } catch (e) {}
-
         if (nameUpdateTimeout) clearTimeout(nameUpdateTimeout);
-        nameUpdateTimeout = setTimeout(async () => {
-            if (currentRecordId) {
-                await updateScoreName(currentRecordId, name);
-                renderOnlineLeaderboard();
-            }
-        }, 700);
+        nameUpdateTimeout = setTimeout(() => {}, 700); // 留空，防止重复提交
     });
 
     document.addEventListener('keydown', function(e) {
         if (e.target === playerName || e.target === inputField) return;
         if (e.key === ' ' && !isPlaying && gameContainer.classList.contains('visible')) {
             e.preventDefault();
-            if (endOverlay.classList.contains('active')) {
-                startGame();
-            }
+            if (endOverlay.classList.contains('active')) startGame();
         }
+    });
+
+    // ========== 灵动岛逻辑 ==========
+    let isIslandExpanded = false;
+
+    dynamicIsland.addEventListener('click', function(e) {
+        if (e.target.closest('.island-btn')) return; // 点按钮不折叠
+        isIslandExpanded = !isIslandExpanded;
+        dynamicIsland.classList.toggle('expanded', isIslandExpanded);
+    });
+
+    playPauseBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        if (bgMusic.paused) {
+            bgMusic.play().catch(err => {
+                console.warn('播放失败，可能是浏览器自动播放限制', err);
+                musicStatus.textContent = '点击播放音乐';
+            });
+        } else {
+            bgMusic.pause();
+        }
+    });
+
+    bgMusic.addEventListener('play', () => { playPauseBtn.textContent = '⏸'; musicStatus.textContent = '正在播放'; });
+    bgMusic.addEventListener('pause', () => { playPauseBtn.textContent = '▶'; musicStatus.textContent = '已暂停'; });
+    bgMusic.addEventListener('error', () => { musicStatus.textContent = '未找到 music.mp3'; });
+
+    leaderboardBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        window.location.href = 'leaderboard/'; 
     });
 
     // ========== 初始化 ==========
@@ -520,11 +374,4 @@
     inputField.disabled = true;
     restartBtn.style.display = 'none';
     gameContainer.classList.remove('visible');
-
-    // 预加载排行榜（可选）
-    fetchTopScores(10).then(list => {
-        if (list && list.length > 0) {
-            // 静默缓存，等结束界面再渲染
-        }
-    });
 })();
