@@ -1,8 +1,7 @@
 (function() {
-    // ========== Supabase 配置（改成你自己的） ==========
+    // ========== Supabase 配置 ==========
     const SUPABASE_URL = 'https://bignhwmpjnplzksokzif.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpZ25od21wam5wbHprc29remlmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk4MTI1NTAsImV4cCI6MjEwNTM4ODU1MH0.FlZRCL5FlT3X1AVIKt02CLoK8CqF8Lja8YAk1f2reL4';
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     // ========== DOM 元素 ==========
     const splashScreen = document.getElementById('splashScreen');
@@ -144,13 +143,27 @@
         }, 1000);
     }
 
-    // ========== 在线提交分数 ==========
+    // ========== 在线提交分数 (原生 fetch，彻底摆脱外部库) ==========
     async function submitScore(entry) {
         try {
-            const { data, error } = await supabase.from('scores').insert([entry]).select();
-            if (error) { console.warn('提交失败', error); return false; }
+            const response = await fetch(`${SUPABASE_URL}/rest/v1/scores`, {
+                method: 'POST',
+                headers: {
+                    'apikey': SUPABASE_ANON_KEY,
+                    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                    'Content-Type': 'application/json',
+                    'Prefer': 'return=minimal'
+                },
+                body: JSON.stringify(entry)
+            });
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
             return true;
-        } catch (e) { console.warn('提交异常', e); return false; }
+        } catch (e) {
+            console.warn('提交失败', e);
+            return false;
+        }
     }
 
     // ========== 游戏逻辑 ==========
@@ -222,7 +235,6 @@
         inputField.disabled = false; inputField.value = ''; inputField.focus();
         endOverlay.classList.remove('active');
         restartBtn.style.display = 'block';
-        // 重置上传按钮状态
         uploadBtn.disabled = false;
         uploadBtn.className = 'btn btn-secondary';
         uploadBtn.textContent = '📤 上传成绩到排行榜';
@@ -255,11 +267,9 @@
         const name = (playerName.value || '').trim() || '匿名玩家';
         try { localStorage.setItem('mj-player-name', name); } catch (e) {}
         
-        // 暂存本局数据，等待玩家点击上传
         currentGameData = {
             name: name, score: score, correct: correctCount, error: errorCount, max_combo: maxCombo
         };
-        // 重置上传按钮
         uploadBtn.disabled = false;
         uploadBtn.className = 'btn btn-secondary';
         uploadBtn.textContent = '📤 上传成绩到排行榜';
@@ -312,7 +322,6 @@
     playAgainBtn.addEventListener('click', startGame);
     restartBtn.addEventListener('click', resetAndStart);
 
-    // 名字改变时保存到本地
     let nameUpdateTimeout = null;
     playerName.addEventListener('input', function() {
         const name = (playerName.value || '').trim() || '匿名玩家';
@@ -334,7 +343,6 @@
         if (this.disabled) return;
         if (!currentGameData) return;
 
-        // 同步最新的名字（防止玩家在点击前修改名字）
         currentGameData.name = (playerName.value || '').trim() || '匿名玩家';
         try { localStorage.setItem('mj-player-name', currentGameData.name); } catch (e) {}
 
