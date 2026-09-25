@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>排行榜测试</title>
+</head>
+<body>
+    <h1>正在测试连接...</h1>
+    <p id="msg"></p>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const msg = document.getElementById('msg');
+        
+        // 1. 检测 Supabase 库有没有加载
+        if (typeof window.supabase === 'undefined') {
+            msg.innerText = '❌ 错误：Supabase 库加载失败（可能是 CDN 被屏蔽）';
+        } else {
+            msg.innerText = '✅ Supabase 库加载成功，正在连接数据库...';
+            
+            const supabase = window.supabase.createClient(
+                'https://bignhwmpjnplzksokzif.supabase.co',
+                'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpZ25od21wam5wbHprc29remlmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk4MTI1NTAsImV4cCI6MjEwNTM4ODU1MH0.FlZRCL5FlT3X1AVIKt02CLoK8CqF8Lja8YAk1f2reL4'
+            );
+
+            // 2. 测试读取数据
+            supabase.from('scores').select('*').limit(1).then(({ data, error }) => {
+                if (error) {
+                    msg.innerText = '❌ 数据库连接失败：\n' + error.message;
+                } else {
+                    msg.innerText = '✅ 数据库连接成功！数据条数：' + (data ? data.length : 0);
+                }
+            }).catch(err => {
+                msg.innerText = '❌ 请求异常：' + err.message;
+            });
+        }
+    </script>
+</body>
+</html>
