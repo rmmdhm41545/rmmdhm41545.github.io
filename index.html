@@ -11,17 +11,19 @@
     <div class="bg-image-layer" aria-hidden="true"></div>
     <div class="particles" id="particles"></div>
 
-    <!-- 灵动岛 -->
+    <!-- 灵动岛 Apple 同款 -->
     <div class="dynamic-island" id="dynamicIsland">
-        <div class="island-collapsed">🎵</div>
+        <div class="island-collapsed">
+            <span class="island-icon">🎵</span>
+        </div>
         <div class="island-expanded">
             <button class="island-btn" id="playPauseBtn" aria-label="播放/暂停">▶</button>
-            <div class="island-text" id="musicStatus">播放音乐</div>
+            <div class="island-text" id="musicStatus">音乐</div>
             <button class="island-btn" id="leaderboardBtn" aria-label="排行榜">🏆</button>
         </div>
     </div>
 
-    <!-- 隐藏的音频 -->
+    <!-- 隐藏的音频，必须确保同级目录有 music.mp3 -->
     <audio id="bgMusic" src="music.mp3" loop></audio>
 
     <!-- 启动画面 -->

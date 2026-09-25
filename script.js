@@ -365,12 +365,22 @@
         }
     });
 
-    // ========== 灵动岛逻辑 ==========
+    // ========== 灵动岛逻辑（Apple 同款） ==========
     let isIslandExpanded = false;
+
+    // 点击灵动岛本身，展开/折叠
     dynamicIsland.addEventListener('click', function(e) {
-        if (e.target.closest('.island-btn')) return;
+        if (e.target.closest('.island-btn')) return; // 点按钮不折叠
         isIslandExpanded = !isIslandExpanded;
         dynamicIsland.classList.toggle('expanded', isIslandExpanded);
+    });
+
+    // 点击灵动岛之外的任何区域，自动收起
+    document.addEventListener('click', function(e) {
+        if (!dynamicIsland.contains(e.target) && isIslandExpanded) {
+            isIslandExpanded = false;
+            dynamicIsland.classList.remove('expanded');
+        }
     });
 
     playPauseBtn.addEventListener('click', function(e) {
